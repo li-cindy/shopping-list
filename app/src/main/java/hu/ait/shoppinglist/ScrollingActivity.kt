@@ -27,11 +27,7 @@ class ScrollingActivity : AppCompatActivity() {
         setContentView(R.layout.activity_scrolling)
         setSupportActionBar(toolbar)
         fab.setOnClickListener { view ->
-            //            var newItemIntent = Intent()
-//            newItemIntent.setClass(this@ScrollingActivity,
-//                NewItemActivity::class.java)
-//
-//            startActivity(newItemIntent)
+
             showAddItemDialog()
         }
 
@@ -76,25 +72,30 @@ class ScrollingActivity : AppCompatActivity() {
             }
         }
 
+        if (inputName == null || inputDescription == null || inputPrice == null || inputCategory == "") {
 
-
-        dialogBuilder.setView(dialogView)
-
-        dialogBuilder.setNegativeButton("Cancel") { dialog, button ->
-            dialog.dismiss()
         }
-        dialogBuilder.setPositiveButton("Add") { dialog, button ->
-            val item = ShoppingItem(
-                inputCategory.toString(),
-                inputName.text.toString(),
-                inputDescription.text.toString(),
-                inputPrice.text.toString().toFloat(),
-                false
-            )
 
-            shoppingListAdapter.addItem(item)
+        else {
+
+            dialogBuilder.setView(dialogView)
+
+            dialogBuilder.setNegativeButton("Cancel") { dialog, button ->
+                dialog.dismiss()
+            }
+            dialogBuilder.setPositiveButton("Add") { dialog, button ->
+                val item = ShoppingItem(
+                    inputCategory.toString(),
+                    inputName.text.toString(),
+                    inputDescription.text.toString(),
+                    inputPrice.text.toString().toFloat(),
+                    false
+                )
+
+                shoppingListAdapter.addItem(item)
+            }
+            dialogBuilder.show()
         }
-        dialogBuilder.show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
