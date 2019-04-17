@@ -14,7 +14,6 @@ import java.lang.RuntimeException
 import android.widget.TextView
 
 
-
 class ShoppingItemDialog : DialogFragment() {
 
     interface ShoppingItemHandler {
@@ -31,7 +30,7 @@ class ShoppingItemDialog : DialogFragment() {
             shoppingItemHandler = context
         } else {
             throw RuntimeException(
-                "The activity does not implement the ShoppingItemHandlerInterface"
+                getString(R.string.does_not_implement)
             )
         }
     }
@@ -44,7 +43,7 @@ class ShoppingItemDialog : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = AlertDialog.Builder(requireContext())
 
-        builder.setTitle("New Item")
+        builder.setTitle(getString(R.string.new_item))
 
         val rootView = requireActivity().layoutInflater.inflate(
             R.layout.new_item_dialog, null
@@ -57,7 +56,6 @@ class ShoppingItemDialog : DialogFragment() {
         categoriesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spItemCategory = rootView.spinnerCategory
         spItemCategory.adapter = categoriesAdapter
-
 
 
         etItemName = rootView.etName
@@ -84,14 +82,14 @@ class ShoppingItemDialog : DialogFragment() {
             etItemDescription.setText(shoppingItem.description)
             etItemPrice.setText(shoppingItem.price.toString())
 
-            builder.setTitle("Edit Item")
+            builder.setTitle(getString(R.string.edit_item))
         }
 
-        builder.setPositiveButton("OK") { dialog, witch ->
+        builder.setPositiveButton(getString(R.string.ok)) { dialog, witch ->
             // empty
         }
 
-        builder.setNegativeButton("CANCEL") { dialog, witch ->
+        builder.setNegativeButton(getString(R.string.cancel)) { dialog, witch ->
             // empty
         }
         return builder.create()
@@ -103,7 +101,8 @@ class ShoppingItemDialog : DialogFragment() {
 
         val positiveButton = (dialog as AlertDialog).getButton(Dialog.BUTTON_POSITIVE)
         positiveButton.setOnClickListener {
-            if (spItemCategory.selectedItemPosition != 0 || etItemName.text.isNotEmpty() || etItemDescription.text.isNotEmpty() || etItemPrice.text.isNotEmpty()) {
+            if (spItemCategory.selectedItemPosition != 0 || etItemName.text.isNotEmpty() ||
+                etItemDescription.text.isNotEmpty() || etItemPrice.text.isNotEmpty()) {
                 val arguments = this.arguments
                 if (arguments != null && arguments.containsKey(ScrollingActivity.KEY_ITEM_TO_EDIT)) {
                     handleShoppingItemEdit()
@@ -114,16 +113,16 @@ class ShoppingItemDialog : DialogFragment() {
                 dialog.dismiss()
             } else {
                 if (spItemCategory.selectedItemPosition == 0) {
-                    (spItemCategory.getChildAt(0) as TextView).error = "This field can not be empty!"
+                    (spItemCategory.getChildAt(0) as TextView).error = getString(R.string.cannot_empty)
                 }
                 if (etItemName.text.isEmpty()) {
-                    etItemName.error = "This field can not be empty!"
+                    etItemName.error = getString(R.string.cannot_empty)
                 }
                 if (etItemDescription.text.isEmpty()) {
-                    etItemDescription.error = "This field can not be empty!"
+                    etItemDescription.error = getString(R.string.cannot_empty)
                 }
                 if (etItemPrice.text.isEmpty()) {
-                    etItemPrice.error = "This field can not be empty!"
+                    etItemPrice.error = getString(R.string.cannot_empty)
                 }
             }
         }
@@ -131,7 +130,6 @@ class ShoppingItemDialog : DialogFragment() {
 
     private fun getCategorySelected() : String {
         var idx = spItemCategory.selectedItemPosition
-
         when (idx) {
             1 -> return getString(R.string.clothing_category)
             2 -> return getString(R.string.electronics_category)

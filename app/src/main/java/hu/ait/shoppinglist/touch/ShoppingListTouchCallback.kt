@@ -7,9 +7,6 @@ import android.support.v7.widget.helper.ItemTouchHelper
 class ShoppingListTouchCallback(private val shoppingListTouchHelperAdapter: ShoppingListTouchHelperCallback)
     : ItemTouchHelper.Callback() {
 
-//    override fun isLongPressDragEnabled(): Boolean {
-//        return true
-//    }
 
     override fun isItemViewSwipeEnabled(): Boolean {
         return true

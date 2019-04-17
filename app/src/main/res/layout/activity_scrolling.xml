@@ -64,4 +64,16 @@
             android:backgroundTint="@android:color/holo_red_dark"
             android:tint="@android:color/white"/>
 
+
+    <TextView
+            android:id="@+id/tvTotal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Total: $00.00"
+            android:textSize="20sp"
+            app:layout_anchorGravity="top|center"
+            app:layout_anchor="@+id/recyclerShoppingList"
+            android:layout_gravity="center"
+            android:gravity="center"/>
+
 </android.support.design.widget.CoordinatorLayout>

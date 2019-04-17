@@ -12,6 +12,8 @@ import hu.ait.shoppinglist.data.ShoppingItem
 import hu.ait.shoppinglist.touch.ShoppingListTouchCallback
 import kotlinx.android.synthetic.main.activity_scrolling.*
 import hu.ait.shoppinglist.data.AppDatabase
+import android.support.v7.app.AlertDialog
+import hu.ait.shoppinglist.adapter.ShoppingListAdapter.Companion.totalCost
 
 
 class ScrollingActivity : AppCompatActivity(), ShoppingItemDialog.ShoppingItemHandler {
@@ -31,12 +33,26 @@ class ScrollingActivity : AppCompatActivity(), ShoppingItemDialog.ShoppingItemHa
         }
 
         deleteAll.setOnClickListener {
-            Thread {
-                AppDatabase.getInstance(this@ScrollingActivity).shoppingItemDao().deleteAllShoppingItems()
-                runOnUiThread {
-                    shoppingListAdapter.deleteAllShoppingItems()
-                }
-            }.start()        }
+
+            val alert = AlertDialog.Builder(
+                this
+            )
+            alert.setTitle(getString(R.string.delete_list))
+            alert.setMessage(getString(R.string.delete_all_items_sure))
+            alert.setPositiveButton(getString(R.string.confirm)) { dialog, witch ->
+                Thread {
+                    AppDatabase.getInstance(this@ScrollingActivity).shoppingItemDao().deleteAllShoppingItems()
+                    runOnUiThread {
+                        shoppingListAdapter.deleteAllShoppingItems()
+                    }
+                }.start()
+            }
+            alert.setNegativeButton(getString(R.string.cancel)) { dialog, witch ->
+            }
+            alert.show()
+
+        }
+
         initRecyclerViewFromDB()
     }
 
@@ -67,12 +83,11 @@ class ScrollingActivity : AppCompatActivity(), ShoppingItemDialog.ShoppingItemHa
 
     private fun showAddItemDialog() {
         ShoppingItemDialog().show(supportFragmentManager, "TAG_ITEM_DIALOG")
-
     }
 
     var editIndex: Int = -1
 
-    public fun showEditItemDialog(itemToEdit: ShoppingItem, idx: Int) {
+    fun showEditItemDialog(itemToEdit: ShoppingItem, idx: Int) {
         editIndex = idx
         val editItemDialog = ShoppingItemDialog()
 
@@ -111,6 +126,7 @@ class ScrollingActivity : AppCompatActivity(), ShoppingItemDialog.ShoppingItemHa
                 shoppingListAdapter.addItem(item)
             }
         }.start()
+//        tvTotal.text = String.format("Total: %.2f", totalCost)
     }
 
     override fun itemUpdated(item: ShoppingItem) {
@@ -121,6 +137,7 @@ class ScrollingActivity : AppCompatActivity(), ShoppingItemDialog.ShoppingItemHa
                 shoppingListAdapter.updateShoppingItem(item, editIndex)
             }
         }.start()
+//        tvTotal.text = String.format("Total: %.2f", totalCost)
     }
 
 }

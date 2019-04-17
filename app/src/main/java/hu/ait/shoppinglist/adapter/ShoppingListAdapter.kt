@@ -10,12 +10,17 @@ import hu.ait.shoppinglist.ScrollingActivity
 import hu.ait.shoppinglist.data.AppDatabase
 import hu.ait.shoppinglist.data.ShoppingItem
 import hu.ait.shoppinglist.touch.ShoppingListTouchHelperCallback
+import kotlinx.android.synthetic.main.activity_scrolling.*
 import kotlinx.android.synthetic.main.list_row.view.*
 import java.util.*
 
 class ShoppingListAdapter : RecyclerView.Adapter<ShoppingListAdapter.ViewHolder>, ShoppingListTouchHelperCallback {
 
     var shoppingItems = mutableListOf<ShoppingItem>()
+
+    companion object {
+        public var totalCost : Float = 0.toFloat()
+    }
 
     private val context: Context
     constructor(context: Context, listShoppingItems: List<ShoppingItem>) : super() {
@@ -27,6 +32,7 @@ class ShoppingListAdapter : RecyclerView.Adapter<ShoppingListAdapter.ViewHolder>
         val itemRowView = LayoutInflater.from(context).inflate(
             R.layout.list_row, viewGroup, false
         )
+        (context as ScrollingActivity).tvTotal.text = String.format("Total: $%.2f", calculateTotalCost())
 
         return ViewHolder(itemRowView)
     }
@@ -44,6 +50,22 @@ class ShoppingListAdapter : RecyclerView.Adapter<ShoppingListAdapter.ViewHolder>
         viewHolder.tvPrice.text = String.format("$%.2f", item.price)
         viewHolder.cbBought.isChecked = item.status
 
+        setCorrectIcon(viewHolder)
+
+        viewHolder.ivEdit.setOnClickListener {
+            (context as ScrollingActivity).showEditItemDialog(item,
+                viewHolder.adapterPosition)
+        }
+
+        viewHolder.cbBought.setOnClickListener {
+            item.status = viewHolder.cbBought.isChecked
+            updateShoppingItem(item)
+        }
+        (context as ScrollingActivity).tvTotal.text = String.format("Total: $%.2f", totalCost)
+
+    }
+
+    private fun setCorrectIcon(viewHolder: ViewHolder) {
         if (viewHolder.tvCategory.text == context.getString(R.string.food_category)) {
             viewHolder.ivIcon.setImageResource(R.drawable.food_icon)
         }
@@ -56,25 +78,20 @@ class ShoppingListAdapter : RecyclerView.Adapter<ShoppingListAdapter.ViewHolder>
         if (viewHolder.tvCategory.text == context.getString(R.string.household_category)) {
             viewHolder.ivIcon.setImageResource(R.drawable.household_icon)
         }
-
-        viewHolder.ivEdit.setOnClickListener {
-            (context as ScrollingActivity).showEditItemDialog(item,
-                viewHolder.adapterPosition)
-        }
-
-        viewHolder.cbBought.setOnClickListener {
-            item.status = viewHolder.cbBought.isChecked
-            updateShoppingItem(item)
-        }
-
     }
 
+
     fun addItem(item: ShoppingItem) {
-        shoppingItems.add(0, item)
-        notifyItemInserted(0)
+        shoppingItems.add(item)
+        notifyDataSetChanged()
+        totalCost += item.price
+        (context as ScrollingActivity).tvTotal.text = String.format("Total: $%.2f", totalCost)
+
     }
 
     fun deleteShoppingItem(deletePosition: Int) {
+        totalCost -= shoppingItems[deletePosition].price
+        (context as ScrollingActivity).tvTotal.text = String.format("Total: $%.2f", totalCost)
         Thread {
             AppDatabase.getInstance(context).shoppingItemDao().deleteShoppingItem(
                 shoppingItems.get(deletePosition))
@@ -89,6 +106,8 @@ class ShoppingListAdapter : RecyclerView.Adapter<ShoppingListAdapter.ViewHolder>
     fun deleteAllShoppingItems() {
         shoppingItems.clear()
         notifyDataSetChanged()
+        totalCost = 0.toFloat()
+        (context as ScrollingActivity).tvTotal.text = String.format("Total: $%.2f", totalCost)
     }
 
     fun updateShoppingItem(item: ShoppingItem) {
@@ -98,6 +117,9 @@ class ShoppingListAdapter : RecyclerView.Adapter<ShoppingListAdapter.ViewHolder>
     }
 
     fun updateShoppingItem(item: ShoppingItem, editIndex: Int) {
+        totalCost -= shoppingItems.get(editIndex).price
+        totalCost += item.price
+        (context as ScrollingActivity).tvTotal.text = String.format("Total: $%.2f", totalCost)
         shoppingItems[editIndex] = item
         notifyItemChanged(editIndex)
     }
@@ -106,10 +128,10 @@ class ShoppingListAdapter : RecyclerView.Adapter<ShoppingListAdapter.ViewHolder>
         deleteShoppingItem(position)
     }
 
-
     override fun onItemMoved(fromPosition: Int, toPosition: Int) {
         Collections.swap(shoppingItems, fromPosition, toPosition)
-        notifyItemMoved(fromPosition, toPosition)    }
+        notifyItemMoved(fromPosition, toPosition)
+    }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var tvCategory = itemView.tvCategory
@@ -119,5 +141,13 @@ class ShoppingListAdapter : RecyclerView.Adapter<ShoppingListAdapter.ViewHolder>
         var cbBought = itemView.cbBought
         var ivIcon = itemView.ivIcon
         var ivEdit = itemView.ivEdit
+    }
+
+    private fun calculateTotalCost() : Float {
+        totalCost = 0.toFloat()
+        for (item in shoppingItems) {
+            totalCost += item.price
+        }
+        return totalCost
     }
 }
