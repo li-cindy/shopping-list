@@ -69,7 +69,7 @@
             android:id="@+id/tvTotal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Total: $00.00"
+            android:text="@string/total"
             android:textSize="20sp"
             app:layout_anchorGravity="top|center"
             app:layout_anchor="@+id/recyclerShoppingList"

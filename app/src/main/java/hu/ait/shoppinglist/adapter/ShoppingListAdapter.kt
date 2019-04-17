@@ -94,9 +94,10 @@ class ShoppingListAdapter : RecyclerView.Adapter<ShoppingListAdapter.ViewHolder>
         (context as ScrollingActivity).tvTotal.text = String.format("Total: $%.2f", totalCost)
         Thread {
             AppDatabase.getInstance(context).shoppingItemDao().deleteShoppingItem(
-                shoppingItems.get(deletePosition))
+                shoppingItems[deletePosition]
+            )
 
-            (context as ScrollingActivity).runOnUiThread {
+            context.runOnUiThread {
                 shoppingItems.removeAt(deletePosition)
                 notifyItemRemoved(deletePosition)
             }
@@ -117,7 +118,7 @@ class ShoppingListAdapter : RecyclerView.Adapter<ShoppingListAdapter.ViewHolder>
     }
 
     fun updateShoppingItem(item: ShoppingItem, editIndex: Int) {
-        totalCost -= shoppingItems.get(editIndex).price
+        totalCost -= shoppingItems[editIndex].price
         totalCost += item.price
         (context as ScrollingActivity).tvTotal.text = String.format("Total: $%.2f", totalCost)
         shoppingItems[editIndex] = item

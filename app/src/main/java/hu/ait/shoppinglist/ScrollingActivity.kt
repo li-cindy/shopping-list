@@ -13,7 +13,6 @@ import hu.ait.shoppinglist.touch.ShoppingListTouchCallback
 import kotlinx.android.synthetic.main.activity_scrolling.*
 import hu.ait.shoppinglist.data.AppDatabase
 import android.support.v7.app.AlertDialog
-import hu.ait.shoppinglist.adapter.ShoppingListAdapter.Companion.totalCost
 
 
 class ScrollingActivity : AppCompatActivity(), ShoppingItemDialog.ShoppingItemHandler {
@@ -126,7 +125,6 @@ class ScrollingActivity : AppCompatActivity(), ShoppingItemDialog.ShoppingItemHa
                 shoppingListAdapter.addItem(item)
             }
         }.start()
-//        tvTotal.text = String.format("Total: %.2f", totalCost)
     }
 
     override fun itemUpdated(item: ShoppingItem) {
@@ -137,7 +135,6 @@ class ScrollingActivity : AppCompatActivity(), ShoppingItemDialog.ShoppingItemHa
                 shoppingListAdapter.updateShoppingItem(item, editIndex)
             }
         }.start()
-//        tvTotal.text = String.format("Total: %.2f", totalCost)
     }
 
 }
