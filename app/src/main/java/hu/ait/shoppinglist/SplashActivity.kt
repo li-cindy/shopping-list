@@ -6,8 +6,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.animation.AnimationUtils
 import kotlinx.android.synthetic.main.activity_splash.*
-import android.support.v4.content.ContextCompat.startActivity
-import android.support.v4.os.HandlerCompat.postDelayed
 
 
 

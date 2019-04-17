@@ -1,25 +1,25 @@
 package hu.ait.shoppinglist
 
-import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import hu.ait.shoppinglist.adapter.ShoppingListAdapter
 import hu.ait.shoppinglist.data.ShoppingItem
 import hu.ait.shoppinglist.touch.ShoppingListTouchCallback
 import kotlinx.android.synthetic.main.activity_scrolling.*
-import kotlinx.android.synthetic.main.new_item_dialog.*
-import kotlinx.android.synthetic.main.new_item_dialog.view.*
-import android.widget.RadioButton
+import hu.ait.shoppinglist.data.AppDatabase
 
 
-class ScrollingActivity : AppCompatActivity() {
+class ScrollingActivity : AppCompatActivity(), ShoppingItemDialog.ShoppingItemHandler {
+
+    companion object {
+        val KEY_ITEM_TO_EDIT = "KEY_ITEM_TO_EDIT"
+    }
+
     lateinit var shoppingListAdapter: ShoppingListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,75 +27,61 @@ class ScrollingActivity : AppCompatActivity() {
         setContentView(R.layout.activity_scrolling)
         setSupportActionBar(toolbar)
         fab.setOnClickListener { view ->
-
             showAddItemDialog()
         }
 
+        deleteAll.setOnClickListener {
+            Thread {
+                AppDatabase.getInstance(this@ScrollingActivity).shoppingItemDao().deleteAllShoppingItems()
+                runOnUiThread {
+                    shoppingListAdapter.deleteAllShoppingItems()
+                }
+            }.start()        }
+        initRecyclerViewFromDB()
+    }
 
-        shoppingListAdapter = ShoppingListAdapter(this)
-        recyclerToDo.layoutManager = LinearLayoutManager(this)
-        recyclerToDo.adapter = shoppingListAdapter
+    private fun initRecyclerViewFromDB() {
+        Thread {
+            var listShoppingItems =
+                AppDatabase.getInstance(this@ScrollingActivity).shoppingItemDao().getAllShoppingItems()
+
+            runOnUiThread {
+                // UI code here
+                shoppingListAdapter = ShoppingListAdapter(this, listShoppingItems)
+
+                recyclerShoppingList.layoutManager = LinearLayoutManager(this)
+
+                recyclerShoppingList.adapter = shoppingListAdapter
+
+                val itemDecoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+                recyclerShoppingList.addItemDecoration(itemDecoration)
+
+                val callback = ShoppingListTouchCallback(shoppingListAdapter)
+                val touchHelper = ItemTouchHelper(callback)
+                touchHelper.attachToRecyclerView(recyclerShoppingList)
+            }
+
+        }.start()
+    }
 
 
-        val itemDecoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-        recyclerToDo.addItemDecoration(itemDecoration)
-
-        val callback = ShoppingListTouchCallback(shoppingListAdapter)
-        val touchHelper = ItemTouchHelper(callback)
-        touchHelper.attachToRecyclerView(recyclerToDo)
+    private fun showAddItemDialog() {
+        ShoppingItemDialog().show(supportFragmentManager, "TAG_ITEM_DIALOG")
 
     }
 
-    private fun showAddItemDialog() {
-        val dialogBuilder = AlertDialog.Builder(this)
-        dialogBuilder.setTitle("New Item")
+    var editIndex: Int = -1
 
+    public fun showEditItemDialog(itemToEdit: ShoppingItem, idx: Int) {
+        editIndex = idx
+        val editItemDialog = ShoppingItemDialog()
 
-        val dialogView = layoutInflater.inflate(
-            R.layout.new_item_dialog,
-            null, false
-        )
-        val inputName = dialogView.etName
-        val inputDescription = dialogView.etDescription
-        val inputPrice = dialogView.etPrice
-        var inputCategory = ""
+        val bundle = Bundle()
+        bundle.putSerializable(KEY_ITEM_TO_EDIT, itemToEdit)
+        editItemDialog.arguments = bundle
 
-
-        if (dialogView.rgCategory != null) {
-            dialogView.rgCategory.setOnCheckedChangeListener { group, checkedId ->
-                if (checkedId != -1) {
-                    inputCategory = (findViewById<View>(checkedId) as? RadioButton)?.text.toString()
-                } else {
-                    inputCategory = "wrong"
-                    // TODO: don't allow them to submit
-                }
-            }
-        }
-
-        if (inputName == null || inputDescription == null || inputPrice == null || inputCategory == "") {
-
-        }
-
-        else {
-
-            dialogBuilder.setView(dialogView)
-
-            dialogBuilder.setNegativeButton("Cancel") { dialog, button ->
-                dialog.dismiss()
-            }
-            dialogBuilder.setPositiveButton("Add") { dialog, button ->
-                val item = ShoppingItem(
-                    inputCategory.toString(),
-                    inputName.text.toString(),
-                    inputDescription.text.toString(),
-                    inputPrice.text.toString().toFloat(),
-                    false
-                )
-
-                shoppingListAdapter.addItem(item)
-            }
-            dialogBuilder.show()
-        }
+        editItemDialog.show(supportFragmentManager,
+            "EDITITEMDIALOG")
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -114,4 +100,27 @@ class ScrollingActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
+
+    override fun itemCreated(item: ShoppingItem) {
+        Thread {
+            var newId = AppDatabase.getInstance(this).shoppingItemDao().insertShoppingItem(item)
+
+            item.itemId = newId
+
+            runOnUiThread {
+                shoppingListAdapter.addItem(item)
+            }
+        }.start()
+    }
+
+    override fun itemUpdated(item: ShoppingItem) {
+        Thread {
+            AppDatabase.getInstance(this).shoppingItemDao().updateShoppingItem(item)
+
+            runOnUiThread {
+                shoppingListAdapter.updateShoppingItem(item, editIndex)
+            }
+        }.start()
+    }
+
 }

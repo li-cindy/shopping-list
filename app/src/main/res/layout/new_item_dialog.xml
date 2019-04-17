@@ -5,33 +5,10 @@
               android:layout_height="match_parent"
               android:padding="12dp">
 
-    <RadioGroup android:id="@+id/rgCategory"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-        <RadioButton
-                android:id="@+id/rbFood"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Food"/>
-        <RadioButton
-                android:id="@+id/rbHousehold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Household"/>
-        <RadioButton
-                android:id="@+id/rbElectronics"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Electronics"/>
-        <RadioButton
-                android:id="@+id/rbOther"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Other"/>
-
-    </RadioGroup>
+    <Spinner
+            android:id="@+id/spinnerCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
     <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"

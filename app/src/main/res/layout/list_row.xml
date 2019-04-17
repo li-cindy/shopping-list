@@ -24,6 +24,16 @@
                 android:textStyle="italic"
                 android:layout_alignParentTop="true"
                 android:textAllCaps="true"/>
+
+        <ImageView
+                android:id="@+id/ivIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/other_icon"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_below="@+id/tvCategory"/>
         <TextView
                 android:id="@+id/tvName"
                 android:layout_width="wrap_content"
@@ -31,6 +41,7 @@
                 android:textSize="24sp"
                 android:textColor="@android:color/black"
                 android:textAllCaps="true"
+                android:layout_toRightOf="@+id/ivIcon"
                 android:layout_below="@+id/tvCategory"/>
         <TextView
                 android:id="@+id/tvDescription"
@@ -50,6 +61,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"/>
+        <ImageView
+                android:id="@+id/ivEdit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_menu_edit"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"/>
 
     </RelativeLayout>
 

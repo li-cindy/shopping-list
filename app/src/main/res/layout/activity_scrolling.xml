@@ -35,10 +35,11 @@
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerToDo"
+            android:id="@+id/recyclerShoppingList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollbars="vertical"
+            android:layout_marginTop="20dp"
             android:padding="20dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
@@ -49,6 +50,18 @@
             android:layout_margin="@dimen/fab_margin"
             app:layout_anchor="@id/app_bar"
             app:layout_anchorGravity="bottom|end"
-            app:srcCompat="@android:drawable/ic_input_add"/>
+            app:srcCompat="@android:drawable/ic_input_add"
+            android:tint="@android:color/white"/>
+
+    <android.support.design.widget.FloatingActionButton
+            android:id="@+id/deleteAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            app:layout_anchor="@+id/app_bar"
+            app:layout_anchorGravity="left|bottom"
+            app:srcCompat="@android:drawable/ic_menu_delete"
+            android:backgroundTint="@android:color/holo_red_dark"
+            android:tint="@android:color/white"/>
 
 </android.support.design.widget.CoordinatorLayout>
